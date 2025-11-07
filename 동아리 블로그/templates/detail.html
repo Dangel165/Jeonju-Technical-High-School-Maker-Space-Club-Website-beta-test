@@ -15,38 +15,70 @@
         .container { max-width: 800px; margin: 30px auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
         .post-header { border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        .post-header h2 { color: #2e8b57; margin-top: 0; font-size: 2.5em; text-align: left; }
-        .post-meta { font-size: 0.9em; color: #888; margin-top: 5px; }
-        .post-content { white-space: pre-wrap; margin-bottom: 40px; } /* 줄바꿈 유지 */
+        .post-header h2 { color: #2e8b57; margin-top: 0; }
+        .post-meta { font-size: 0.9em; color: #777; margin-bottom: 10px; }
+        
+        .post-content { padding: 20px; border: 1px solid #ddd; border-radius: 5px; background: #fafafa; min-height: 150px; white-space: pre-wrap; }
 
-        .post-actions { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px; }
-        .post-actions a, .post-actions button { 
+        /* 버튼 스타일 */
+        .post-actions { margin-top: 20px; text-align: right; }
+        .action-btn, .delete-btn { 
             padding: 8px 15px; 
+            border: none; 
             border-radius: 5px; 
-            text-decoration: none; 
+            cursor: pointer; 
             font-weight: bold; 
-            transition: background 0.3s;
-            cursor: pointer;
-            border: none;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: 10px;
         }
-        .edit-btn { background: #4682b4; color: white; }
-        .edit-btn:hover { background: #3a6a90; }
-        .delete-btn { background: #d9534f; color: white; }
-        .delete-btn:hover { background: #b54541; }
+        .action-btn { background: #ffc107; color: #333; }
+        .delete-btn { background: #dc3545; color: white; }
+
+        /* 플래시 메시지 스타일 */
+        .flash-message { padding: 10px; margin-bottom: 15px; border-radius: 5px; font-weight: bold; }
+        .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .flash-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
         /* 댓글 스타일 */
-        .comments-section h3 { border-bottom: 1px solid #ddd; padding-bottom: 10px; color: #2e8b57; }
-        .comment-item { border-bottom: 1px dashed #eee; padding: 10px 0; }
-        .comment-item:last-child { border-bottom: none; }
-        .comment-meta { font-size: 0.85em; color: #666; margin-bottom: 5px; }
+        .comments-section { margin-top: 50px; }
+        .comment-item { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 5px; background: #fff; }
+        .comment-meta { font-size: 0.85em; color: #555; margin-bottom: 5px; }
         .comment-content { margin: 0; }
-
-        .comment-form textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; box-sizing: border-box; }
-        .comment-form input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; box-sizing: border-box; }
-        .comment-form button { background: #3cb371; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s; }
-        .comment-form button:hover { background: #2e8b57; }
-
-        footer { text-align: center; padding: 20px; background: #2e8b57; color: white; margin-top: 50px; font-size: 0.8em; }
+        .comment-form input[type="text"], .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .comment-form button[type="submit"] {
+            background-color: #2e8b57;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* 신고 섹션 스타일 */
+        .report-section {
+            margin-top: 40px; 
+            border-top: 1px dashed #ccc; 
+            padding-top: 20px;
+            background: #ffe0e0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .report-section h4 { 
+            color: #dc3545; 
+            margin-top: 0; 
+            margin-bottom: 15px; 
+            border-bottom: 1px solid #f00; 
+            padding-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -58,14 +90,15 @@
                 <li><a href="{{ url_for('index') }}#about">동아리 소개</a></li>
                 <li><a href="{{ url_for('index') }}#activity">활동 기록</a></li>
                 <li><a href="{{ url_for('index') }}#members">멤버 소개</a></li>
-                <!-- 이전에 수정된 부분: member_login_page -> member_login -->
-                <li><a href="{{ url_for('member_login') }}">동아리 로그인</a></li>
-                
-                {% if g.user %}
+                {% if g.user and g.user.is_member %}
+                <li><a href="{{ url_for('write') }}">활동 기록 작성</a></li>
+                <li><a href="{{ url_for('member_login') }}">로그인 상태 ({{ g.user.id }})</a></li>
+                    {% if g.user.is_admin %}
+                    <li><a href="{{ url_for('admin_dashboard') }}" style="color: #ffcc00;">⭐ 관리자 메뉴 ⭐</a></li>
+                    {% endif %}
                 <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
                 {% else %}
-                <!-- [BUILD ERROR FIX APPLIED HERE] login_page -> login 으로 수정 -->
-                <li><a href="{{ url_for('login') }}">일반 로그인</a></li>
+                <li><a href="{{ url_for('member_login') }}">동아리 로그인</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -73,13 +106,10 @@
 
     <div class="container">
         
-        <!-- Flash 메시지 표시 -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                <div style="padding: 10px; margin-bottom: 20px; border-radius: 5px; background: {% if category == 'error' %}#f8d7da{% elif category == 'success' %}#d4edda{% else %}#fff3cd{% endif %}; color: {% if category == 'error' %}#721c24{% elif category == 'success' %}#155724{% else %}#856404{% endif %}; border: 1px solid {% if category == 'error' %}#f5c6cb{% elif category == 'success' %}#c3e6cb{% else %}#ffeeba{% endif %};">
-                    {{ message }}
-                </div>
+                    <div class="flash-message {% if category == 'success' %}flash-success{% else %}flash-{{ category }}{% endif %}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
@@ -87,28 +117,46 @@
         <div class="post-header">
             <h2>{{ post.title }}</h2>
             <div class="post-meta">
-                <span>작성자: {{ post.author }}</span> | 
-                <span>작성일: {{ post.created_at.strftime('%Y년 %m월 %d일 %H:%M') }}</span>
+                작성자: **{{ post.author }}** | 
+                작성일: **{{ post.created_at | korean_date_format }}**
             </div>
         </div>
 
-        <!-- 수정/삭제 버튼 (동아리 멤버에게만 표시) -->
-        {% if g.user and g.user.is_member %}
+        {% if g.user and g.user.id == post.author %}
         <div class="post-actions">
-            <a href="{{ url_for('edit', post_id=post.id) }}" class="edit-btn">수정</a>
-            <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}" onsubmit="return confirm('정말로 이 활동 기록을 삭제하시겠습니까?');" style="margin: 0;">
-                <button type="submit" class="delete-btn">삭제</button>
+            <a href="{{ url_for('edit', post_id=post.id) }}" class="action-btn">수정</a>
+            <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}" style="display:inline;">
+                <button type="submit" onclick="return confirm('정말로 이 활동 기록을 삭제하시겠습니까? (첨부 파일도 영구 삭제됩니다.)');" class="delete-btn">삭제</button>
             </form>
         </div>
         {% endif %}
 
         <div class="post-content">
+            
+            {% if post.file_path %}
+                <div style="margin-bottom: 30px; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 5px; background: #f9f9f9;">
+                    {% set filename = post.file_path.split('/')[-1] %}
+                    {% set extension = filename.split('.')[-1].lower() %}
+                    
+                    {% if extension in ['png', 'jpg', 'jpeg', 'gif'] %}
+                        <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="업로드 이미지" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    {% elif extension in ['mp4', 'mov', 'avi'] %}
+                        <video controls style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <source src="{{ url_for('uploaded_file', filename=filename) }}" type="video/{{ 'mp4' if extension == 'mp4' else ('quicktime' if extension in ['mov','avi'] else 'mp4') }}"> 
+                            브라우저가 동영상 태그를 지원하지 않습니다.
+                        </video>
+                    {% else %}
+                        <p>첨부된 파일: <a href="{{ url_for('uploaded_file', filename=filename) }}" target="_blank">{{ filename }}</a></p>
+                    {% endif %}
+                    <small style="display: block; margin-top: 10px; color: #555;">(첨부 파일)</small>
+                </div>
+            {% endif %}
+
             {{ post.content }}
         </div>
 
         <a href="{{ url_for('index') }}" style="display: block; text-align: center; margin-top: 30px; color: #2e8b57; font-weight: bold;">← 목록으로 돌아가기</a>
         
-        <!-- 댓글 섹션 -->
         <div class="comments-section" style="margin-top: 50px;">
             <h3>댓글 ({{ comments|length }})</h3>
 
@@ -116,22 +164,40 @@
             <div class="comment-item">
                 <div class="comment-meta">
                     <strong>{{ comment.username }}</strong>
-                    <span>({{ comment.created_at.strftime('%Y-%m-%d %H:%M') }})</span>
+                    <span>(**{{ comment.created_at | korean_date_format }}**)</span>
                 </div>
                 <p class="comment-content">{{ comment.content }}</p>
             </div>
             {% endfor %}
 
-            <!-- 댓글 작성 폼 -->
             <div class="comment-form" style="margin-top: 20px;">
                 <h4>댓글 작성</h4>
+                {% if g.user and g.user.is_banned %}
+                <p style="color: red; font-weight: bold;">⛔ **정지된 계정은 댓글을 작성할 수 없습니다.**</p>
+                {% else %}
                 <form method="POST" action="{{ url_for('add_comment', post_id=post.id) }}">
-                    <input type="text" name="username" placeholder="이름 (생략 시 익명)" maxlength="20">
+                    <input type="text" name="username" placeholder="이름 (생략 시 익명)" maxlength="20" {% if g.user %} value="{{ g.user.id }}" disabled {% endif %}>
                     <textarea name="content" placeholder="댓글 내용을 입력해 주세요." required></textarea>
                     <button type="submit">댓글 등록</button>
                 </form>
+                {% endif %}
             </div>
         </div>
+        
+        <div class="report-section">
+            <h4>🚨 이 게시물/댓글을 신고하기</h4>
+            {% if g.user and g.user.is_banned %}
+            <p style="color: red; font-weight: bold;">⛔ **정지된 계정은 신고할 수 없습니다.**</p>
+            {% else %}
+            <form method="POST" action="{{ url_for('report_item', post_id=post.id) }}" style="display: flex; gap: 10px; align-items: center;">
+                <input type="hidden" name="reported_content" value="게시물 제목: {{ post.title }}">
+                <input type="text" name="reason" placeholder="신고 사유를 간략히 입력하세요 (예: 욕설, 광고)" required style="flex-grow: 1; padding: 8px; border: 1px solid #dc3545; border-radius: 4px;">
+                <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">신고 접수</button>
+            </form>
+            <small style="color: #721c24;">* 신고는 관리자 확인 후 처리됩니다. 악의적인 신고는 제한될 수 있습니다.</small>
+            {% endif %}
+        </div>
+
     </div>
 
     <footer>

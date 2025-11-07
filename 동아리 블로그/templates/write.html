@@ -12,63 +12,85 @@
         nav ul li { margin: 0 15px; }
         nav ul li a { color: #fff; text-decoration: none; font-weight: bold; }
 
+        /* 관리자 메뉴 스타일 추가 */
+        .admin-menu a {
+            color: #ffcc00 !important;
+            background: #800000; 
+            font-weight: 900 !important;
+        }
+
         .container { max-width: 700px; margin: 30px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #2e8b57; margin-bottom: 30px; }
 
-        form label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        form input[type="text"], form textarea { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 20px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            box-sizing: border-box; 
-            font-size: 16px;
+        form label { display: block; margin: 15px 0 5px; font-weight: bold; color: #2e8b57; }
+        form input[type="text"], form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
         }
-        form textarea { min-height: 300px; resize: vertical; }
-
-        form button[type="submit"] { 
-            background: #2e8b57; 
-            color: white; 
-            padding: 12px 25px; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            font-size: 18px; 
-            font-weight: bold;
-            transition: background 0.3s;
+        form textarea {
+            min-height: 300px;
+            resize: vertical;
+        }
+        form button[type="submit"] {
             display: block;
             width: 100%;
+            padding: 15px;
+            background-color: #2e8b57;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: background-color 0.3s;
         }
-        form button[type="submit"]:hover { background: #1e6e42; }
+        form button[type="submit"]:hover {
+            background-color: #236a43;
+        }
+        
+        .flash-message { padding: 10px; margin-bottom: 15px; border-radius: 5px; font-weight: bold; text-align: center; }
+        .flash-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 
-        .back-link { display: block; text-align: center; margin-top: 20px; color: #4682b4; text-decoration: none; }
-        
-        .flash-message { padding: 10px; margin-bottom: 20px; border-radius: 5px; }
-        .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        
-        footer { text-align: center; padding: 20px; background: #2e8b57; color: white; margin-top: 50px; font-size: 0.8em; }
+        /* 파일 업로드 스타일 */
+        form input[type="file"] {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1><a href="{{ url_for('index') }}" style="color: inherit; text-decoration: none;">전주공업고등학교 메이커 스페이스</a></h1>
-        <p>활동 기록 및 정보 공유 블로그</p>
+        <h1>전주공고 메이커 스페이스</h1>
+        <p>새 활동 기록 작성</p>
+        
         <nav>
             <ul>
                 <li><a href="{{ url_for('index') }}#about">동아리 소개</a></li>
                 <li><a href="{{ url_for('index') }}#activity">활동 기록</a></li>
                 <li><a href="{{ url_for('index') }}#members">멤버 소개</a></li>
-                <li><a href="{{ url_for('member_login') }}">동아리 로그인</a></li>
                 
                 {% if g.user %}
-                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
+                    {# 로그인 상태 #}
+                    {% if g.user.is_admin %}
+                    <li class="admin-menu"><a href="{{ url_for('admin_dashboard') }}">관리자 메뉴 ⭐</a></li>
+                    {% endif %}
+                    <li style="font-weight: bold; color: #ffcc00; padding: 0 10px;">{{ g.user.id }}님</li>
+                    <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
                 {% else %}
-                <li><a href="{{ url_for('login') }}">일반 로그인</a></li>
+                    {# 로그아웃 상태: 두 가지 로그인 옵션 표시 #}
+                    <li><a href="{{ url_for('member_login') }}">동아리 로그인</a></li>
+                    <li><a href="{{ url_for('login') }}">일반 로그인</a></li>
                 {% endif %}
             </ul>
         </nav>
-    </header>
+        </header>
 
     <div class="container">
         <h2>새 활동 기록 작성</h2>
@@ -76,30 +98,36 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                {% if category == 'error' %}
-                    <div class="flash-message flash-error">{{ message }}</div>
-                {% endif %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data"> 
             <label for="title">제목</label>
             <input type="text" id="title" name="title" required placeholder="활동 주제를 명확하게 작성해 주세요.">
 
-            <label for="author">작성자 (선택 사항)</label>
-            <input type="text" id="author" name="author" placeholder="{{ g.user.id if g.user else '익명' }}" value="{{ g.user.id if g.user else '' }}">
+            <label for="author">작성자 (자동 입력)</label>
+            <input type="text" id="author" name="author" 
+                   placeholder="{{ g.user.id if g.user else '익명' }}" 
+                   value="{{ g.user.id if g.user else '' }}" 
+                   disabled 
+                   style="color: #666; background: #eee;">
 
             <label for="content">내용</label>
             <textarea id="content" name="content" required placeholder="활동 목표, 과정, 결과, 느낀 점 등을 상세히 기록해 주세요."></textarea>
             
+            <label for="file">사진/동영상 파일 업로드 (선택, 16MB 이하)</label>
+            <input type="file" id="file" name="file" accept="image/*,video/*" style="margin-bottom: 5px;">
+            <small style="display: block; color: #777;">허용 확장자: png, jpg, jpeg, gif, mp4, mov, avi</small>
+
             <button type="submit">기록 완료</button>
         </form>
-        <a href="{{ url_for('index') }}" class="back-link">← 메인 페이지로 돌아가기</a>
+        <a href="{{ url_for('index') }}" style="display: block; text-align: center; margin-top: 20px; color: #2e8b57; font-weight: bold;">← 목록으로 돌아가기</a>
     </div>
 
     <footer>
-        <p>&copy; 전주공업고등학교 메이커 스페이스 동아리. All Rights Reserved.</p>
+        <p style="text-align: center; font-size: 0.8em; color: #999; padding-top: 15px;">&copy; 전주공업고등학교 메이커 스페이스 동아리</p>
     </footer>
 </body>
 </html>

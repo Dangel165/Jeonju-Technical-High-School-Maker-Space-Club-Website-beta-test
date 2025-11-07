@@ -62,13 +62,23 @@
     </header>
 
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div style="padding: 10px; margin-bottom: 20px; border-radius: 5px; background: {% if category == 'error' or category == 'danger' %}#f8d7da{% elif category == 'success' %}#d4edda{% else %}#fff3cd{% endif %}; color: {% if category == 'error' or category == 'danger' %}#721c24{% elif category == 'success' %}#155724{% else %}#856404{% endif %}; border: 1px solid {% if category == 'error' or category == 'danger' %}#f5c6cb{% elif category == 'success' %}#c3e6cb{% else %}#ffeeba{% endif %};">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         <h2>동아리 멤버 가입 신청</h2>
         
         <div class="info-box">
-            <p>입력하신 정보는 관리자 이메일(sid753855@gmail.com)로 전송되며, 관리자 승인 후 동아리 멤버로 등록됩니다.</p>
+            <p>입력하신 정보는 관리자에게 전달되며, 관리자 승인 후 동아리 멤버로 등록됩니다. (아이디/비밀번호는 별도 부여)</p>
         </div>
 
-        <form id="registerForm" class="register-form">
+        <form method="POST" action="{{ url_for('submit_application') }}" class="register-form">
             <div>
                 <label for="student_id">학번 (예: 31209):</label>
                 <input type="text" id="student_id" name="student_id" placeholder="학번을 입력하세요 (예: 31209)" required>
@@ -77,35 +87,10 @@
                 <label for="name">이름:</label>
                 <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
             </div>
-            <button type="submit">가입 신청 이메일 보내기</button>
+            <button type="submit">가입 신청하기</button>
         </form>
-
         <a href="{{ url_for('member_login') }}" style="display: block; margin-top: 25px; color: #2e8b57; font-weight: bold;">← 동아리 멤버 로그인 페이지로 돌아가기</a>
     </div>
-
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const studentId = document.getElementById('student_id').value;
-            const name = document.getElementById('name').value;
-            
-            // 이메일 제목과 본문 내용 설정
-            const subject = encodeURIComponent(`[동아리 가입 신청] ${name}`);
-            const body = encodeURIComponent(
-                `안녕하세요, 동아리 가입을 신청합니다.\n\n` +
-                `* 학번: ${studentId}\n` +
-                `* 이름: ${name}\n\n` +
-                `확인 후 가입 승인 절차를 진행해 주시기 바랍니다.`
-            );
-
-            // mailto 링크 생성 및 실행
-            window.location.href = `mailto:sid753855@gmail.com?subject=${subject}&body=${body}`;
-        
-            // 사용자에게 안내 메시지 표시 (선택 사항)
-            alert('이메일 프로그램이 실행됩니다. 내용을 확인 후 전송해 주세요.');
-        });
-    </script>
 
     <footer>
         <p>&copy; 2024 전주공업고등학교 메이커 스페이스 동아리. All Rights Reserved.</p>

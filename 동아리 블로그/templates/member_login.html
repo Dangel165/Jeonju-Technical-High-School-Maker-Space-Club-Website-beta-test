@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동아리 멤버 로그인</title>
+    <style>
+        /* 기본 스타일 및 폰트 설정 */
+        body { 
+            font-family: 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            line-height: 1.6; 
+            background: #f4f4f4; 
+            color: #333; 
+        }
+        
+        /* 헤더 스타일 */
+        header { 
+            background: #2e8b57; 
+            color: #fff; 
+            padding: 20px; 
+            text-align: center; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        header h1 { margin: 0; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; }
+        nav ul li { margin: 0 15px; }
+        nav ul li a { color: #fff; text-decoration: none; font-weight: bold; transition: color 0.3s; }
+        nav ul li a:hover { color: #ffcc00; }
+
+        /* 로그인 컨테이너 스타일 */
+        .container { 
+            max-width: 450px; 
+            margin: 80px auto; 
+            padding: 40px; 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15); 
+            text-align: center;
+            /* 애니메이션 효과: 아래에서 위로 부드럽게 나타나기 */
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { 
+            color: #2e8b57; 
+            margin-bottom: 30px; 
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        /* 폼 스타일 */
+        .login-form {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .login-form div {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+        /* [중요] name="student_id"로 설정되어 있어 app.py에서 이 이름으로 받아야 합니다. */
+        input[type="text"], input[type="password"] {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #2e8b57;
+            box-shadow: 0 0 5px rgba(46, 139, 87, 0.3);
+            outline: none;
+        }
+
+        /* 버튼 스타일 */
+        button[type="submit"] {
+            background: #2e8b57;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background 0.3s, transform 0.1s;
+        }
+        button[type="submit"]:hover {
+            background: #3cb371;
+            transform: translateY(-2px);
+        }
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        /* 메시지 및 링크 스타일 */
+        .flash-message { 
+            padding: 10px; 
+            margin-bottom: 20px; 
+            border-radius: 5px; 
+            font-weight: bold;
+            background: #ffdbdb; /* 기본 에러 색상 */
+            color: #d8000c;
+        }
+        .flash-warning {
+            background: #fff8e1;
+            color: #ffa000;
+        }
+        .register-options {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+        }
+        /* 공통 링크 스타일 */
+        .register-options a {
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+            display: block;
+            padding: 5px 0; /* 링크의 패딩을 주어 터치 영역 확보 */
+        }
+
+        /* 가입 신청 링크 스타일 */
+        .register-options .member-register-link {
+            color: #4682b4; /* 파란색 계열 링크 */
+            margin-top: 10px;
+        }
+        .register-options .member-register-link:hover {
+            color: #2e8b57;
+            text-decoration: underline;
+        }
+
+        /* 일반 로그인 선택 링크 스타일 */
+        .register-options .general-login-link {
+            color: #888; /* 회색 계열 링크 */
+            margin-top: 15px;
+            font-size: 0.9em;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .register-options .general-login-link:hover {
+            color: #555;
+            background-color: #f0f0f0;
+        }
+        
+        /* 미디어 쿼리 */
+        @media (max-width: 600px) {
+            .container {
+                margin: 50px 20px;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>전주공업고등학교 메이커 스페이스</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">홈으로</a></li>
+                <li><a href="{{ url_for('member_login') }}">동아리 로그인</a></li>
+                {% if g.user %}
+                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">일반 사용자 접속</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>동아리 멤버 로그인</h2>
+        
+        <!-- Flask에서 flash 메시지를 표시하는 블록 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {% if category == 'warning' %}flash-warning{% endif %}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('member_login') }}" class="login-form">
+            <div>
+                <label for="student_id">아이디 (학번):</label>
+                <input type="text" id="student_id" name="student_id" placeholder="ID (makerspace_jj)를 입력하세요" required>
+            </div>
+            <div>
+                <label for="password">비밀번호:</label>
+                <input type="password" id="password" name="password" placeholder="PW (1234)를 입력하세요" required>
+            </div>
+            <button type="submit">로그인</button>
+        </form>
+
+        <div class="register-options">
+            <p style="margin-bottom: 10px; color: #666;">아직 동아리 계정이 없으신가요?</p>
+            <a href="{{ url_for('member_register') }}" class="member-register-link">→ 동아리 멤버 가입 신청하기</a>
+            
+            <!-- [추가된 부분] 일반 사용자 로그인 선택 링크 -->
+            <a href="{{ url_for('login') }}" class="general-login-link">
+                일반 사용자 로그인/접속 선택
+            </a>
+        </div>
+        
+    </div>
+
+</body>
+</html>

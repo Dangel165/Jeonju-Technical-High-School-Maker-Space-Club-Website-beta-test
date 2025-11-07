@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동아리 멤버 회원가입</title>
+    <style>
+        body { font-family: 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; line-height: 1.6; background: #f4f4f4; color: #333; }
+        header { background: #2e8b57; color: #fff; padding: 20px; text-align: center; }
+        header h1 { margin: 0; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; }
+        nav ul li { margin: 0 15px; }
+        nav ul li a { color: #fff; text-decoration: none; font-weight: bold; }
+
+        .container { max-width: 400px; margin: 50px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; }
+        h2 { color: #2e8b57; margin-bottom: 30px; }
+        
+        .register-form { text-align: left; }
+        .register-form label, .register-form input { display: block; margin-bottom: 10px; }
+        .register-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .register-form button {
+            background-color: #2e8b57;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .info-box { padding: 15px; background: #fff8e1; border: 1px solid #ffe0b2; border-radius: 5px; margin-bottom: 20px; color: #ff9800; font-size: 0.9em; }
+
+        footer { text-align: center; padding: 20px; background: #2e8b57; color: white; margin-top: 50px; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('index') }}" style="color: inherit; text-decoration: none;">전주공업고등학교 메이커 스페이스</a></h1>
+        <p>활동 기록 및 정보 공유 블로그</p>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}#about">동아리 소개</a></li>
+                <li><a href="{{ url_for('index') }}#activity">활동 기록</a></li>
+                <li><a href="{{ url_for('index') }}#members">멤버 소개</a></li>
+                <li><a href="{{ url_for('member_login') }}">동아리 로그인</a></li>
+                
+                {% if g.user %}
+                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">일반 로그인</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>동아리 멤버 가입 신청</h2>
+        
+        <div class="info-box">
+            <p>입력하신 정보는 관리자 이메일(sid753855@gmail.com)로 전송되며, 관리자 승인 후 동아리 멤버로 등록됩니다.</p>
+        </div>
+
+        <form id="registerForm" class="register-form">
+            <div>
+                <label for="student_id">학번 (예: 31209):</label>
+                <input type="text" id="student_id" name="student_id" placeholder="학번을 입력하세요 (예: 31209)" required>
+            </div>
+            <div>
+                <label for="name">이름:</label>
+                <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
+            </div>
+            <button type="submit">가입 신청 이메일 보내기</button>
+        </form>
+
+        <a href="{{ url_for('member_login') }}" style="display: block; margin-top: 25px; color: #2e8b57; font-weight: bold;">← 동아리 멤버 로그인 페이지로 돌아가기</a>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const studentId = document.getElementById('student_id').value;
+            const name = document.getElementById('name').value;
+            
+            // 이메일 제목과 본문 내용 설정
+            const subject = encodeURIComponent(`[동아리 가입 신청] ${name}`);
+            const body = encodeURIComponent(
+                `안녕하세요, 동아리 가입을 신청합니다.\n\n` +
+                `* 학번: ${studentId}\n` +
+                `* 이름: ${name}\n\n` +
+                `확인 후 가입 승인 절차를 진행해 주시기 바랍니다.`
+            );
+
+            // mailto 링크 생성 및 실행
+            window.location.href = `mailto:sid753855@gmail.com?subject=${subject}&body=${body}`;
+        
+            // 사용자에게 안내 메시지 표시 (선택 사항)
+            alert('이메일 프로그램이 실행됩니다. 내용을 확인 후 전송해 주세요.');
+        });
+    </script>
+
+    <footer>
+        <p>&copy; 2024 전주공업고등학교 메이커 스페이스 동아리. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

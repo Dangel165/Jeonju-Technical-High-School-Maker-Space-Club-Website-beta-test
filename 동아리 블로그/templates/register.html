@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        /* 폰트 및 기본 설정 (한국어 안정화) */
+        body {
+            font-family: 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: #2d3748; /* 다크 그레이 배경 */
+            color: #e2e8f0; /* 밝은 텍스트 색상 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background: #1a202c; /* 카드 배경 (더 어둡게) */
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            border: 1px solid #4a5568;
+        }
+
+        h2 {
+            text-align: center;
+            color: #48bb78; /* 메인 색상 (그린 계열) */
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #cbd5e0;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            background-color: #2d3748;
+            color: #e2e8f0;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #48bb78;
+            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.5); /* 그린 계열 포커스 링 */
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #1a202c; /* 버튼 텍스트 색상 */
+            background-image: linear-gradient(to right, #48bb78 0%, #38a169 100%); /* 그린 그라데이션 */
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.2s;
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+            margin-top: 15px;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-submit:active {
+            transform: translateY(1px);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        .register-link a {
+            color: #48bb78;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .register-link a:hover {
+            color: #38a169;
+            text-decoration: underline;
+        }
+
+        /* Flash Message 스타일 */
+        .flash-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+        .flash-success { background-color: #48bb78; color: white; }
+        .flash-danger, .flash-error { background-color: #e53e3e; color: white; }
+        .flash-info { background-color: #4299e1; color: white; }
+    </style>
+</head>
+<body>
+    
+    <!-- Flash 메시지 컨테이너 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}" style="display: block;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const flashMessages = document.querySelectorAll('.flash-message');
+                    flashMessages.forEach(msg => {
+                        setTimeout(() => {
+                            msg.style.opacity = '0';
+                            // 트랜지션이 끝난 후 메시지 숨기기
+                            setTimeout(() => { msg.style.display = 'none'; }, 500); 
+                        }, 5000); 
+                    });
+                });
+            </script>
+        {% endif %}
+    {% endwith %}
+
+    <div class="register-container">
+        <h2>새 계정 만들기</h2>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            
+            <!-- 아이디 (username) -->
+            <div class="form-group">
+                <label for="username">아이디 (로그인용)</label>
+                <input type="text" id="username" name="username" required
+                       class="input-field"
+                       placeholder="사용할 아이디를 입력하세요."
+                       autocomplete="username">
+            </div>
+
+            <!-- 비밀번호 (password) -->
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" required
+                       class="input-field"
+                       placeholder="비밀번호를 입력하세요."
+                       autocomplete="new-password">
+            </div>
+            
+            <!-- 표시 이름 (display_name) -->
+            <div class="form-group">
+                <label for="display_name">표시 이름 (게시물 작성 시 노출)</label>
+                <input type="text" id="display_name" name="display_name" required
+                       class="input-field"
+                       placeholder="활동에 사용할 닉네임을 입력하세요."
+                       autocomplete="name">
+            </div>
+
+            <!-- 회원가입 버튼 -->
+            <button type="submit" class="btn-submit">
+                회원가입 완료
+            </button>
+        </form>
+
+        <!-- 로그인 페이지로 돌아가기 링크 -->
+        <div class="register-link">
+            이미 계정이 있으신가요?
+            <a href="{{ url_for('login') }}">
+                로그인으로 돌아가기
+            </a>
+        </div>
+    </div>
+</body>
+</html>

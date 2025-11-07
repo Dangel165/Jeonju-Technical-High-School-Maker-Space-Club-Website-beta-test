@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>활동 기록 수정 | {{ post.title }}</title>
+    <style>
+        body { font-family: 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; line-height: 1.6; background: #f4f4f4; color: #333; }
+        header { background: #2e8b57; color: #fff; padding: 20px; text-align: center; }
+        header h1 { margin: 0; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; }
+        nav ul li { margin: 0 15px; }
+        nav ul li a { color: #fff; text-decoration: none; font-weight: bold; }
+
+        .container { max-width: 700px; margin: 30px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2e8b57; margin-bottom: 30px; }
+
+        form label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        form input[type="text"], form textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 20px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+            font-size: 16px;
+        }
+        form textarea { min-height: 300px; resize: vertical; }
+
+        form button[type="submit"] { 
+            background: #4682b4; 
+            color: white; 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 18px; 
+            font-weight: bold;
+            transition: background 0.3s;
+            display: block;
+            width: 100%;
+        }
+        form button[type="submit"]:hover { background: #3a6a90; }
+        
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #4682b4; text-decoration: none; }
+
+        footer { text-align: center; padding: 20px; background: #2e8b57; color: white; margin-top: 50px; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('index') }}" style="color: inherit; text-decoration: none;">전주공업고등학교 메이커 스페이스</a></h1>
+        <p>활동 기록 및 정보 공유 블로그</p>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}#about">동아리 소개</a></li>
+                <li><a href="{{ url_for('index') }}#activity">활동 기록</a></li>
+                <li><a href="{{ url_for('index') }}#members">멤버 소개</a></li>
+                <li><a href="{{ url_for('member_login') }}">동아리 로그인</a></li>
+                
+                {% if g.user %}
+                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">일반 로그인</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>활동 기록 수정: {{ post.title }}</h2>
+
+        <form method="POST">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" required value="{{ post.title }}">
+
+            <label for="author">작성자</label>
+            <input type="text" id="author" name="author" value="{{ post.author }}" disabled>
+
+            <label for="content">내용</label>
+            <textarea id="content" name="content" required>{{ post.content }}</textarea>
+            
+            <button type="submit">수정 완료</button>
+        </form>
+        <a href="{{ url_for('detail', post_id=post.id) }}" class="back-link">← 상세 페이지로 돌아가기</a>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 전주공업고등학교 메이커 스페이스 동아리. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

@@ -12,7 +12,6 @@ from werkzeug.utils import secure_filename
 from pathlib import Path 
 
 # =================================================================
-# [필수 수정: UnicodeEncodeError 방지]
 # 파이썬의 표준 입출력 스트림이 UTF-8 인코딩을 사용하도록 강제합니다.
 try:
     if sys.stdout.encoding != 'utf-8':
@@ -73,7 +72,7 @@ def korean_date_format(value):
 app.jinja_env.filters['korean_date_format'] = korean_date_format
 
 # =================================================================
-# IP 주소 및 Audit Log 관련 함수 (보안 로깅)
+# IP 주소 및 Audit Log 관련 함수 
 # =================================================================
 
 def get_remote_addr():
@@ -204,7 +203,7 @@ with app.app_context():
     db = get_db()
     cursor = db.cursor()
     
-    # ⭐ [수정] 1. report_logs 테이블 존재 확인 로직을 최상단으로 이동하여 
+    # 1. report_logs 테이블 존재 확인 로직을 최상단으로 이동하여 
     #            테이블이 없으면 먼저 init_db()를 호출하여 테이블을 모두 생성하도록 함.
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='report_logs';")
     if cursor.fetchone() is None:
@@ -220,7 +219,7 @@ with app.app_context():
             pass # 테이블이 없으면 무시
         init_db() # 이 시점에서 모든 테이블(posts 포함)이 생성됨
     
-    # ⭐ [수정] 2. init_db() 호출 후, 테이블이 확실히 존재할 때 컬럼 마이그레이션을 시도합니다.
+    #  2. init_db() 호출 후, 테이블이 확실히 존재할 때 컬럼 마이그레이션을 시도합니다.
 
     # posts 테이블에 file_path 컬럼이 없는 경우 추가 (기존 DB 사용 시)
     try:
@@ -866,4 +865,5 @@ def process_report(report_id):
 if __name__ == '__main__':
     print(f"Flask 시작. 기본 인코딩: {sys.getdefaultencoding()}, stdout 인코딩: {sys.stdout.encoding}")
     # 릴리스 환경에서는 debug=True 사용 지양
+
     app.run(debug=True)
